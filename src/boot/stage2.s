@@ -68,7 +68,7 @@ stage2:
   call rm_print
 
   ; PAY ATTENTION TO SECTORS IN CASE KERNEL GROWS TOO BIG!!!
-  mov al, 4
+  mov al, 8
   mov cl, 4 ; If stage2 grows, this must change
   mov dl, [BOOT_DRIVE]
 

@@ -1,7 +1,7 @@
 #ifndef STD_MATH_H
 #define STD_MATH_H
 
-#define MATH_PRECISION 0.1
+#define MATH_PRECISION 0.01
 
 // Binary search square root algorigthm
 // https://slaystudy.com/c-program-to-find-the-square-root-of-a-number/
@@ -13,5 +13,7 @@ float fmin(float a, float b);
 
 int imax(int a, int b);
 float fmax(float a, float b);
+
+float clamp(float a, float min, float max);
 
 #endif
