@@ -18,6 +18,8 @@ main:
   mov ds, ax
   cld
 
+  ; TODO: use disk_load routine
+
   mov ah, 0x02
   mov al, 63   ; 63 Sectors
   mov ch, 0x00 ; Cylinder 0
