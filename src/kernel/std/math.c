@@ -1,5 +1,7 @@
 #include "math.h"
 
+// Binary search square root algorigthm
+// https://slaystudy.com/c-program-to-find-the-square-root-of-a-number/
 double _sqrt(double x, double precision) {
   double start = 0, end = x, mid = 0;
 

@@ -3,8 +3,6 @@
 
 #define MATH_PRECISION 0.01
 
-// Binary search square root algorigthm
-// https://slaystudy.com/c-program-to-find-the-square-root-of-a-number/
 #define sqrt(x) _sqrt(x, MATH_PRECISION)
 double _sqrt(double x, double precision);
 

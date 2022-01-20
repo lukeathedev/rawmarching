@@ -95,14 +95,17 @@ float map(float x, float imin, float imax, float omin, float omax) {
 
 // Screen functions
 
-void draw() {
+void draw(float xoff) {
+  // The image is double-buffered to avoid tearing
+  uint8_t image[RES_X][RES_Y] = { 0 };
+
   for (int y = 0; y < RES_Y; ++y) {
     for (int x = 0; x < RES_X; ++x) {
       float u = (((float)x) - 0.5 * RES_X) / RES_Y;
       // y coord is reversed
       float v = (((float)RES_Y-y) - 0.5 * RES_Y) / RES_Y;
 
-      v3f ro = { .x = -1+(float)FRAME/10, .y = 1, .z = 2 };
+      v3f ro = { .x = xoff, .y = 1, .z = 2 };
       v3f rd = { .x = u, .y = v, .z = 1 };
       rd = v3f_norm(rd);
 
@@ -111,10 +114,16 @@ void draw() {
       v3f p = v3f_addvv(ro, v3f_mulvf(rd, d));
 
       float dif = get_light(p);
+      if (dif < 0.1) dif = 0.1;
       // float dif = get_normal(p).y;
       int col = (int)map(dif, 0, 1, 0, 255);
+      image[x][y] = col;
+    }
+  }
 
-      putpixel(x, y, col);
+  for (int y = 0; y < RES_Y; ++y) {
+    for (int x = 0; x < RES_X; ++x) {
+      putpixel(x, y, image[x][y]);
     }
   }
 }
@@ -133,10 +142,16 @@ void _start() {
     set_palette(i, r, g, b);
   }
 
-  int i = 0;
+  float xoff = -2;
+  int dir = 1;
 
   for (;;) {
-    draw();
+    draw(xoff);
+
+    xoff += (float)dir/10;
+    if (xoff >  2) dir = -1;
+    if (xoff < -2) dir =  1;
+
     FRAME++;
   }
 }
