@@ -6,12 +6,17 @@
 
 ; Globals
 BOOT_DRIVE db 0x0
-KERNEL_OFFSET equ 0x1000
 
 jmp stage2
 
 stage2:
-  mov si, 0 ; Weird bug
+  mov si, 0 ; Weird duplicated string bug fix
+
+  pusha
+  mov ah, 0x01
+  mov cx, 0x2607 ; Hidden cursor
+  int 0x10
+  popa
 
   mov si, STR_LOADED_STAGE_2
   call rm_print
@@ -62,26 +67,25 @@ stage2:
   mov si, STR_KERNEL_LOAD
   call rm_print
 
-  mov dx, KERNEL_OFFSET
-  call rm_print_hex
-
-  mov si, STR_NEWLINE
-  call rm_print
-
   ; PAY ATTENTION TO SECTORS IN CASE KERNEL GROWS TOO BIG!!!
-  mov al, 1
+  mov al, 4
   mov cl, 4 ; If stage2 grows, this must change
   mov dl, [BOOT_DRIVE]
-  xor bx, bx
+
+  ; Load kernel at 0x10000
+  mov bx, 0x1000
   mov es, bx
-  mov bx, KERNEL_OFFSET
+  xor bx, bx
   call disk_load
 
-
+  ; Use BIOS to switch video mode
+  xor ah, ah
+  mov al, 0x13
+  int 0x10
 
   ; Switch to pmode
-  mov si, STR_PMODE_TRY
-  call rm_print
+  ; mov si, STR_PMODE_TRY
+  ; call rm_print
 
   cli
   lgdt [gdt_descriptor]
@@ -109,7 +113,7 @@ init_pm:
   mov esp, ebp
 
   ; Jump to kernel previously loaded
-  call KERNEL_OFFSET
+  call 0x10000
   hlt
 
 ; Includes
@@ -124,9 +128,8 @@ STR_LOADED_STAGE_2 db `[INFO]  Loaded stage2 successfully\r\n`, 0
 STR_A20_ENABLED    db `[INFO]  A20 Gate is enabled\r\n`, 0
 STR_FAST_A20_TRY   db `[INFO]  Attempting to use FAST A20\r\n`, 0
 STR_A20_FAIL       db `[ERROR] A20 Gate could not be enabled\r\n`, 0
-STR_KERNEL_LOAD    db `[INFO]  Loading kernel at `, 0
+STR_KERNEL_LOAD    db `[INFO]  Loading kernel at 0x10000\r\n`, 0
 STR_PMODE_TRY      db `[INFO]  Switching to protected mode\r\n`, 0
-STR_NEWLINE        db `\r\n`, 0
 
-; temporary padding for kernel load test
+; stage2 1KB padding
 times 1024 - ($ - $$) db 0

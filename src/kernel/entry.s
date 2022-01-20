@@ -1,5 +1,5 @@
 [BITS 32]
-[EXTERN main]
+[EXTERN _start]
 
-call main
+call _start
 hlt

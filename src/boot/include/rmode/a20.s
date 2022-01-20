@@ -1,7 +1,6 @@
 ; name: a20.s
 ; desc: A20 Gate checking/enabling routines
 
-
 [BITS 16]
 
 ; The following code is public domain licensed

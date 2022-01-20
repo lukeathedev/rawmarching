@@ -6,7 +6,6 @@ make run
 <b>Makefile migration in progress!</b>
 
 TODO:
-  implement makefile
-  vga graphics mode driver
+  vga graphics mode driver (not quite) -- using BIOS mode switching
   keyboard driver
   raymarching

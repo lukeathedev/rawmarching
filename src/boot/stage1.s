@@ -10,8 +10,8 @@ main:
   mov bh, 0b00000111 ; Light gray on black
   call rm_clear
 
-  mov si, STR_LOADING_STAGE_2
-  call rm_print
+  ; mov si, STR_LOADING_STAGE_2
+  ; call rm_print
 
   ; https://en.wikipedia.org/wiki/INT_13H#INT_13h_AH=02h:_Read_Sectors_From_Drive
   xor ax, ax

@@ -3,6 +3,8 @@ CC = i386-elf-gcc
 LD = i386-elf-ld
 AS = nasm
 
+DEPS = $(patsubst %.c,${OBJDIR}/%.o,kernel.c vga.c)
+
 OBJDIR = obj
 IMGDIR = img
 
@@ -25,8 +27,8 @@ ${OBJDIR}/%.bin: src/boot/%.s
 	${AS} $< -f bin -i "src/boot/include" -o $@
 
 # Kernel files
-${OBJDIR}/kernel.bin: ${OBJDIR}/kernel_entry.o ${OBJDIR}/kernel.o
-	${LD} -o $@ -Ttext 0x1000 $^ --oformat binary
+${OBJDIR}/kernel.bin: ${OBJDIR}/kernel_entry.o ${DEPS}
+	${LD} -o $@ -Ttext 0x10000 $^ --oformat binary
 
 ${OBJDIR}/%.o: src/kernel/%.c
 	${CC} -c $< -o $@ -ffreestanding -O2 -Wextra -fno-pic
