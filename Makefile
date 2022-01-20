@@ -29,7 +29,7 @@ ${OBJDIR}/kernel.bin: ${OBJDIR}/kernel_entry.o ${OBJDIR}/kernel.o
 	${LD} -o $@ -Ttext 0x1000 $^ --oformat binary
 
 ${OBJDIR}/%.o: src/kernel/%.c
-	${CC} -c $< -o $@ -ffreestanding -O2 -Wextra
+	${CC} -c $< -o $@ -ffreestanding -O2 -Wextra -fno-pic
 
 ${OBJDIR}/kernel_entry.o: src/kernel/entry.s
 	${AS} $< -f elf -o $@
