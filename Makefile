@@ -1,9 +1,10 @@
 QEMU = qemu-system-x86_64
 CC = i386-elf-gcc
+CFLAGS = -ffreestanding -O2 -Wall -pedantic -Wextra -fno-pic
 LD = i386-elf-ld
 AS = nasm
 
-DEPS = $(patsubst %.c,${OBJDIR}/%.o,kernel.c vga.c)
+DEPS = $(patsubst %.c,${OBJDIR}/%.o,kernel.c io/io.c io/vga.c std/math.c std/vec.c)
 
 OBJDIR = obj
 IMGDIR = img
@@ -31,7 +32,7 @@ ${OBJDIR}/kernel.bin: ${OBJDIR}/kernel_entry.o ${DEPS}
 	${LD} -o $@ -Ttext 0x10000 $^ --oformat binary
 
 ${OBJDIR}/%.o: src/kernel/%.c
-	${CC} -c $< -o $@ -ffreestanding -O2 -Wextra -fno-pic
+	${CC} -c $< -o $@ ${CFLAGS}
 
 ${OBJDIR}/kernel_entry.o: src/kernel/entry.s
 	${AS} $< -f elf -o $@
@@ -41,12 +42,12 @@ ${OBJDIR}/kernel_entry.o: src/kernel/entry.s
 
 .PHONY: clean make_directories
 clean:
-	rm -rf img/*
-	rm -rf obj/*
+	rm -rf img
+	rm -rf obj
 make_directories: ${OBJDIR} ${IMGDIR}
 
 ${OBJDIR}:
-	mkdir -p ${OBJDIR}
+	mkdir -p ${OBJDIR}/{io,std}
 
 ${IMGDIR}:
 	mkdir -p ${IMGDIR}

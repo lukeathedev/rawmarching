@@ -1,48 +1,82 @@
 #include <stdint.h>
 
-#include "vga.h"
+#include "io/vga.h"
+#include "std/math.h"
+#include "std/vec.h"
 
-// TODO: implement sleep function for fixed framerate
+// Constants
 
-double pow(double x, int b) {
-  double res = x;
-  for (int i = 1; i < b; ++i) {
-    res *= x;
-  }
+#define MAX_STEPS 100
+#define MAX_DIST  100
+#define SURF_DIST .01
 
-  return res;
+// Raymarching functions
+
+float get_dist(v3f p) {
+  v3f sphere = { .x = 0, .y = 1, .z = 6 };
+  float sphere_r = 1.0;
+
+  float dS = v3f_mag(v3f_subvv(p, sphere)) - sphere_r;
+  float dP = p.y;
+
+  float d = fmin(dS, dP);
+  return d;
 }
 
-void draw(int xoff) {
-  int r = 40;
+float raymarch(v3f ro, v3f rd) {
+  float dO = 0;
 
-  for (int y = 0; y < 200; ++y) {
-    for (int x = 0; x < 320; ++x) {
-      if (pow((double)x-(xoff), 2)+pow((double)y-r, 2) < pow(r, 2)) {
-        putpixel(x, y, (x-xoff)*(x-xoff)%0b1111);
-      }
-      else {
-        putpixel(x, y, 0);
-      }
+  for (int i = 0; i < MAX_STEPS; ++i) {
+    v3f p = v3f_addvv(ro, v3f_mulvf(rd, dO));
+    float dS = get_dist(p);
+    dO += dS;
+    if (dO > MAX_DIST || dS < SURF_DIST) break;
+  }
+
+  return dO;
+}
+
+
+// Misc functions
+
+float map(float x, float imin, float imax, float omin, float omax) {
+  return (x - imin) * (omax - omin) / (imax - imin) + omin;
+}
+
+// Screen functions
+
+void draw() {
+  for (int y = 0; y < RES_Y; ++y) {
+    for (int x = 0; x < RES_X; ++x) {
+      float u = (((float)x) - 0.5 * RES_X) / RES_Y;
+      float v = (((float)y) - 0.5 * RES_Y) / RES_Y;
+
+      v3f ro = { .x = 0, .y = 1, .z = 0 };
+      v3f rd = { .x = u, .y = v, .z = 1 };
+      rd = v3f_norm(rd);
+
+      float d = raymarch(ro, rd);
+      d /= 6.0;
+
+      if (d > 1.0) d = 1.0;
+      int col = (int)map(d, 0, 1, 0, 255);
+
+      putpixel(x, y, col);
     }
   }
 }
 
-void _start(){
-  // int x = 0;
-  // int y = 6;
+// Entrypoint
 
-  // print(0b00101111, "[INFO]  Kernel called at 0x10000", &x, &y);
-  // y++;
-  // print(0b00000111, "[INFO]  Switching to VGA 640x480 16-color", &x, &y);
-
-  double xoff = 0;
-  int dir = 1;
-
-  for (;;) {
-    xoff+=0.025 * dir;
-    if (xoff > 360) dir *= -1;
-    if (xoff < -40) dir *= -1;
-    draw(xoff);
+void _start() {
+  // Set color palette to grayscale
+  // Channels are 6-bit!
+  for (int i = 1; i < 256; ++i) {
+    uint8_t r = (int)map(i, 0, 255, 0, 63);
+    uint8_t b = (int)map(i, 0, 255, 0, 63);
+    uint8_t g = (int)map(i, 0, 255, 0, 63);
+    set_palette(i, r, g, b);
   }
+
+  draw();
 }
