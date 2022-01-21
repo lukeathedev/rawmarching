@@ -7,6 +7,8 @@
 #define VGA_SET_PALETTE 0x03C8
 #define VGA_SET_COLOR   0x03C9
 
+// Video mode is currently set by bootloader
+// update these accordingly
 #define VGA_VIDEO_MEM   0xA0000
 #define RES_X           320
 #define RES_Y           200

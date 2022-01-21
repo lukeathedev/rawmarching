@@ -61,23 +61,25 @@ v3f get_normal(v3f p) {
     .z = p.z - epsilon
   };
 
-  v3f test = {
+  v3f d_close = {
     .x = get_dist(xc),
     .y = get_dist(yc),
     .z = get_dist(zc)
   };
 
-  v3f n = v3f_subfv(d, test);
+  v3f n = v3f_subfv(d, d_close);
 
   return v3f_norm(n);
 }
 
 float get_light(v3f p) {
-  v3f light_pos = { .x = 20, .y = 8, .z = 26 };
-  v3f l = v3f_mulvf(v3f_norm(v3f_subvv(light_pos, p)), 0.5);
+  v3f light_pos = { .x = 10, .y = 10, .z = 0 };
+  v3f l = v3f_mulvf(v3f_norm(v3f_subvv(light_pos, p)), 0.35);
   v3f n = get_normal(p);
 
   float dif = clamp(v3f_dot(n, l), 0, 1);
+
+  // Shadows
   float d = raymarch(v3f_addvv(p, v3f_mulvf(n, SURF_DIST * 2)), l);
   if (d < v3f_mag(v3f_subvv(light_pos, p))) dif *= 0.1;
 
@@ -97,7 +99,7 @@ float map(float x, float imin, float imax, float omin, float omax) {
 
 void draw(float xoff) {
   // The image is double-buffered to avoid tearing
-  uint8_t image[RES_X][RES_Y] = { 0 };
+  // uint8_t image[RES_X][RES_Y] = { 0 };
 
   for (int y = 0; y < RES_Y; ++y) {
     for (int x = 0; x < RES_X; ++x) {
@@ -105,7 +107,7 @@ void draw(float xoff) {
       // y coord is reversed
       float v = (((float)RES_Y-y) - 0.5 * RES_Y) / RES_Y;
 
-      v3f ro = { .x = xoff, .y = 1, .z = 2 };
+      v3f ro = { .x = xoff, .y = 1.5, .z = 2 };
       v3f rd = { .x = u, .y = v, .z = 1 };
       rd = v3f_norm(rd);
 
@@ -117,15 +119,18 @@ void draw(float xoff) {
       if (dif < 0.1) dif = 0.1;
       // float dif = get_normal(p).y;
       int col = (int)map(dif, 0, 1, 0, 255);
-      image[x][y] = col;
+
+      // image[x][y] = col;
+      putpixel(x, y, col);
     }
   }
 
-  for (int y = 0; y < RES_Y; ++y) {
-    for (int x = 0; x < RES_X; ++x) {
-      putpixel(x, y, image[x][y]);
-    }
-  }
+  // Double buffering (disabled for slow hardware)
+  // for (int y = 0; y < RES_Y; ++y) {
+  //   for (int x = 0; x < RES_X; ++x) {
+  //     putpixel(x, y, image[x][y]);
+  //   }
+  // }
 }
 
 // Entrypoint
@@ -142,16 +147,23 @@ void _start() {
     set_palette(i, r, g, b);
   }
 
-  float xoff = -2;
-  int dir = 1;
+  // Draw 1 frame and return
+  draw(-1.5);
+  return;
 
-  for (;;) {
-    draw(xoff);
+  // Use the below code if you want animated
+  // panning instead
 
-    xoff += (float)dir/10;
-    if (xoff >  2) dir = -1;
-    if (xoff < -2) dir =  1;
+  // float xoff = -1.5;
+  // int dir = 1;
 
-    FRAME++;
-  }
+  // for (;;) {
+  //   draw(xoff);
+
+  //   xoff += (float)dir/10;
+  //   if (xoff >  1.5) dir = -1;
+  //   if (xoff < -1.5) dir =  1;
+
+  //   FRAME++;
+  // }
 }

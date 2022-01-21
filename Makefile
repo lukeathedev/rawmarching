@@ -19,24 +19,24 @@ run: all
 	-m 2048 \
 	-drive format=raw,file=./img/bootdisk.raw
 
+# the disk is padded to 1.44MB (floppy size)
 bootdisk.raw: ${OBJDIR}/stage1.bin ${OBJDIR}/stage2.bin ${OBJDIR}/kernel.bin
 	cat $^ > ${IMGDIR}/bootdisk.raw
+	dd if=/dev/null of=${IMGDIR}/bootdisk.raw bs=1 count=1 seek=1474560
 
 # Assembly (bootloader) files
-
 ${OBJDIR}/%.bin: src/boot/%.s
 	${AS} $< -f bin -i "src/boot/include" -o $@
 
 # Kernel files
 ${OBJDIR}/kernel.bin: ${OBJDIR}/kernel_entry.o ${DEPS}
-	${LD} -o $@ -Ttext 0x10000 $^ --oformat binary
+	${LD} -o $@ -T linker.ld $^ --oformat binary
 
 ${OBJDIR}/%.o: src/kernel/%.c
 	${CC} -c $< -o $@ ${CFLAGS}
 
 ${OBJDIR}/kernel_entry.o: src/kernel/entry.s
 	${AS} $< -f elf -o $@
-
 
 
 
