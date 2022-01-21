@@ -107,7 +107,10 @@ void draw(float xoff) {
       // y coord is reversed
       float v = (((float)RES_Y-y) - 0.5 * RES_Y) / RES_Y;
 
+      // Camera position
       v3f ro = { .x = xoff, .y = 1.5, .z = 2 };
+
+      // Ray direction
       v3f rd = { .x = u, .y = v, .z = 1 };
       rd = v3f_norm(rd);
 
@@ -117,7 +120,7 @@ void draw(float xoff) {
 
       float dif = get_light(p);
       if (dif < 0.1) dif = 0.1;
-      // float dif = get_normal(p).y;
+
       int col = (int)map(dif, 0, 1, 0, 255);
 
       // image[x][y] = col;

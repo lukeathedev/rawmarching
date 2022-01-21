@@ -19,7 +19,7 @@ run: all
 	-m 2048 \
 	-drive format=raw,file=./img/bootdisk.raw
 
-# the disk is padded to 1.44MB (floppy size)
+# The disk is padded to 1.44MB (floppy size)
 bootdisk.raw: ${OBJDIR}/stage1.bin ${OBJDIR}/stage2.bin ${OBJDIR}/kernel.bin
 	cat $^ > ${IMGDIR}/bootdisk.raw
 	dd if=/dev/null of=${IMGDIR}/bootdisk.raw bs=1 count=1 seek=1474560
