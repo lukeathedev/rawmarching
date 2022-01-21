@@ -35,7 +35,7 @@ Switching from real to protected mode in x86 platforms can be quite the undertak
  - [os-dev PDF by Nick Blundell](https://www.cs.bham.ac.uk/~exr/lectures/opsys/10_11/lectures/os-dev.pdf) - a great introduction to low-level development for dummies
  - [Ray Marching for Dummies!](https://www.youtube.com/watch?v=PGtv-dBi2wE) - an approachable introductory video to raymarching by Martijn Steinrucken
 
-There are also other mentions scattered throughout the code, mostly of resources that helped me implement certain algorithms and functions. For a more thorough list of credits, refer to [the live demo website](https://rawmarching-web.vercel.app/#Thanks).
+There are also other mentions scattered throughout the code, mostly of resources that helped me implement certain algorithms and functions. For a more thorough list of credits, refer to [the live demo website](https://rawmarching-web.vercel.app/#thanks).
 
 ## What's missing
 
